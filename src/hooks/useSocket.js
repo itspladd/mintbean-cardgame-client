@@ -7,39 +7,24 @@ import EVENTS from '../constants/EVENTS'
 export default function useSocket(server) {
 
   // Set up state holder
-  const [socketState, setSocketState] = useState({
-    socket: null,
-    connected: false,
-    msg: "No connection attempted"
-  });
+  const [socket, setSocket] = useState(null)
 
   // Set up socket connection and event handlers
   useEffect(() => {
     const socket = socketClient(server)
+    console.log(socket)
 
-    socket.on(EVENTS.SOCKET_CONNECT, () => {
-      setSocketState({
-        socket: socket,
-        connected: true,
-        msg: `Connected at ${server}`
-      });
-    })
+    socket.on(EVENTS.SOCKET_CONNECT, () => setSocket(socket))
 
     socket.on(EVENTS.USER_CONNECT, userHandlers.handleUserConnect)
 
-    socket.on(EVENTS.SOCKET_DISCONNECT, (reason) => {
-      setSocketState({
-        socket: null,
-        connected: false,
-        msg: `Disconnected. Reason: ${reason}`
-      });
-    })
+    socket.on(EVENTS.SOCKET_DISCONNECT, (reason) => setSocket(null))
 
     return function cleanup() {
       socket.disconnect();
     }
   }, [server])
 
-  return [socketState, setSocketState]
+  return [socket, setSocket]
 }
 

@@ -11,25 +11,32 @@ const SOCKET_SERVER = 'http://127.0.0.1:8080';
 
 function App() {
 
-  const [socketState, setSocketState] = useSocket(SOCKET_SERVER);
+  const [userList, setUserList] = useState();
+  const [socket, setSocket] = useSocket(SOCKET_SERVER);
   const [userState, setUserState] = useState({
     id: null,
     username: null
   });
 
+  const host = socket && socket.io.engine.hostname
+  const port = socket && socket.io.engine.port
+
+  const loginStatus = userState.id ? `, logged in as ${userState.username}` : `, not logged in`
+
   return (
     <div className="App">
       <header className="App-header">
         <p>
-          {socketState.msg}
+          {socket && `Connected at ${host}:${port}`}
+          {loginStatus}
         </p>
         {!userState.id && 
         <Login 
           setUserState={setUserState}
-          setSocketState={setSocketState}
-          socketState={socketState} />}
+          setSocket={setSocket}
+          socket={socket} />}
       </header>
-      {userState.id && <Lobby />}
+      {userState.id && <Lobby userList={userList} />}
       {userState.id && <GameWindow />}
 
 

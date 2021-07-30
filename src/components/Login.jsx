@@ -12,14 +12,14 @@ export default function Login(props) {
   const handleSubmit = event => {
     event.preventDefault();
     console.log(event)
-    socketState.socket.emit(EVENTS.USER_CONNECT, formState)
+    socket.emit(EVENTS.USER_CONNECT, formState)
     setUserState({
       id: 1,
       username: formState
     })
   }
 
-  const { socketState, setUserState, setSocketState } = props;
+  const { socket, setUserState, setSocket } = props;
   return(
     <form onSubmit={handleSubmit}>
       <label for="name">Username</label>

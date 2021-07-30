@@ -1,5 +1,7 @@
+import '../styles/GameWindow.css';
+
 export default function GameWindow() {
   return(
-    <div>GameWindow</div>
+    <div className="GameWindow">GameWindow</div>
   )
 }
