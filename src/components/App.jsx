@@ -1,7 +1,6 @@
 import '../styles/App.css';
 
-import {useState} from 'react'
-import useSocket from '../hooks/useSocket';
+import useAppData from '../hooks/useAppData'
 
 import Login from './Login'
 import GameWindow from './GameWindow'
@@ -11,33 +10,30 @@ const SOCKET_SERVER = 'http://127.0.0.1:8080';
 
 function App() {
 
-  const [userList, setUserList] = useState();
-  const [socket, setSocket] = useSocket(SOCKET_SERVER);
-  const [userState, setUserState] = useState({
-    id: null,
-    username: null
-  });
+  const {state, dispatch, ACTIONS} = useAppData(SOCKET_SERVER);
+
+  const {socket, user} = state;
 
   const host = socket && socket.io.engine.hostname
   const port = socket && socket.io.engine.port
 
-  const loginStatus = userState.id ? `, logged in as ${userState.username}` : `, not logged in`
+  const connectStatus = socket ? `Connected at ${host}:${port}` : `Not connected`
+  const loginStatus = user ? `, logged in as ${user.username}` : `, not logged in`
 
   return (
     <div className="App">
       <header className="App-header">
         <p>
-          {socket && `Connected at ${host}:${port}`}
+          {connectStatus}
           {loginStatus}
         </p>
-        {!userState.id && 
+        {!user && 
         <Login 
-          setUserState={setUserState}
-          setSocket={setSocket}
-          socket={socket} />}
+          state={state}
+          dispatch={dispatch} />}
       </header>
-      {userState.id && <Lobby userList={userList} />}
-      {userState.id && <GameWindow />}
+      {/* {userState.id && <Lobby userList={userList} />} */}
+      {user && <GameWindow />}
 
 
     </div>
