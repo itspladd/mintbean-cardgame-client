@@ -1,6 +1,9 @@
 import socketClient from 'socket.io-client'
 import { useState, useEffect } from 'react';
 
+import userHandlers from '../handlers/users'
+import EVENTS from '../constants/EVENTS'
+
 export default function useSocket(server) {
 
   // Set up state holder
@@ -14,7 +17,7 @@ export default function useSocket(server) {
   useEffect(() => {
     const socket = socketClient(server)
 
-    socket.on('connection', () => {
+    socket.on(EVENTS.SOCKET_CONNECT, () => {
       setSocketState({
         socket: socket,
         connected: true,
@@ -22,14 +25,16 @@ export default function useSocket(server) {
       });
     })
 
-    socket.on('disconnect', (reason) => {
+    socket.on(EVENTS.USER_CONNECT, userHandlers.handleUserConnect)
+
+    socket.on(EVENTS.SOCKET_DISCONNECT, (reason) => {
       setSocketState({
         socket: null,
         connected: false,
         msg: `Disconnected. Reason: ${reason}`
       });
     })
-    
+
     return function cleanup() {
       socket.disconnect();
     }
