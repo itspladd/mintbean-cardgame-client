@@ -2,9 +2,10 @@ import '../styles/App.css';
 
 import {useState} from 'react'
 import useSocket from '../hooks/useSocket';
-import EVENTS from '../constants/EVENTS'
 
 import Login from './Login'
+import GameWindow from './GameWindow'
+import Lobby from './Lobby'
 
 const SOCKET_SERVER = 'http://127.0.0.1:8080';
 
@@ -28,6 +29,8 @@ function App() {
           setSocketState={setSocketState}
           socketState={socketState} />}
       </header>
+      {userState.id && <Lobby />}
+      {userState.id && <GameWindow />}
 
 
     </div>
