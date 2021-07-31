@@ -1,19 +1,22 @@
 import {useReducer, useEffect} from 'react';
 import socketClient from 'socket.io-client'
 
-import userHandlers from '../handlers/users'
+import makeUserHandlers from '../handlers/users'
 import EVENTS from '../constants/EVENTS'
 
 export default function useAppData(server) {
   //Constants for reducer actions
   const ACTIONS = {
     SET_SOCKET: "SET_SOCKET",
-    SET_USER: "SET_USER"
+    SET_USER: "SET_USER",
+    ADD_USER: "ADD_USER",
+    SET_USER_LIST: "SET_USER_LIST"
   };
 
   const initialState = {
     socket: null,
-    user: null
+    user: null,
+    userList:[]
   }
 
   // Set up reducer function.
@@ -21,6 +24,7 @@ export default function useAppData(server) {
 
     // Set the socket.
     const setSocket = ({ socket }) => {
+      console.log('dispatched setSocket')
       return { ...state, socket };
     };
 
@@ -29,9 +33,20 @@ export default function useAppData(server) {
       return { ...state, user: {username, id}};
     };
 
+    const addUser = ({username}) => {
+      const userList = [...state.userList, username]
+      return { ...state, userList}
+    }
+
+    const setUserList = ({userList}) => {
+      return { ...state, userList};
+    }
+
     const actions = {
       [ACTIONS.SET_SOCKET]: setSocket,
-      [ACTIONS.SET_USER]: setUser
+      [ACTIONS.SET_USER]: setUser,
+      [ACTIONS.ADD_USER]: addUser,
+      [ACTIONS.SET_USER_LIST]: setUserList
     };
 
     return actions[action.type]({ ...action })
@@ -42,8 +57,7 @@ export default function useAppData(server) {
   // After everything renders, attempt to connect to socket.
   useEffect(() => {
     const socket = socketClient(server)
-
-    console.log(socket)
+    const userHandlers = makeUserHandlers(socket, dispatch, ACTIONS);
 
     socket.on(EVENTS.SOCKET_CONNECT, () => dispatch({ type: ACTIONS.SET_SOCKET, socket}))
 

@@ -3,6 +3,8 @@ import EVENTS from '../constants/EVENTS'
 
 export default function Login(props) {
   const [formState, setFormState] = useState("");
+  const {state, dispatch, ACTIONS} = props;
+  const {socket} = state;
 
   const handleChange = event => {
     event.preventDefault();
@@ -13,13 +15,12 @@ export default function Login(props) {
     event.preventDefault();
     console.log(event)
     socket.emit(EVENTS.USER_CONNECT, formState)
-    setUserState({
+    dispatch({
+      type: ACTIONS.SET_USER,
       id: 1,
       username: formState
     })
   }
-
-  const { socket, setUserState, setSocket } = props;
   return(
     <form onSubmit={handleSubmit}>
       <label for="name">Username</label>

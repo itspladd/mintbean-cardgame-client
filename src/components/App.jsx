@@ -10,7 +10,8 @@ const SOCKET_SERVER = 'http://127.0.0.1:8080';
 
 function App() {
 
-  const {state, dispatch, ACTIONS} = useAppData(SOCKET_SERVER);
+  const appData = useAppData(SOCKET_SERVER);
+  const { state, dispatch, ACTIONS} = appData
 
   const {socket, user} = state;
 
@@ -28,11 +29,9 @@ function App() {
           {loginStatus}
         </p>
         {!user && 
-        <Login 
-          state={state}
-          dispatch={dispatch} />}
+        <Login {...appData} />}
       </header>
-      {/* {userState.id && <Lobby userList={userList} />} */}
+      {user && <Lobby { ...appData } />}
       {user && <GameWindow />}
 
 
