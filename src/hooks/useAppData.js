@@ -1,17 +1,19 @@
 import {useReducer, useEffect} from 'react';
 import socketClient from 'socket.io-client'
 
-import makeUserHandlers from '../handlers/users'
+import makeSocketEventHandlers from '../handlers'
 import EVENTS from '../constants/EVENTS'
 
+// Constants for reducer actions.
+// Set outside the hook function or else React complains.
+const ACTIONS = {
+  SET_SOCKET: "SET_SOCKET",
+  SET_USER: "SET_USER",
+  ADD_USER: "ADD_USER",
+  SET_USER_LIST: "SET_USER_LIST"
+};
+
 export default function useAppData(server) {
-  //Constants for reducer actions
-  const ACTIONS = {
-    SET_SOCKET: "SET_SOCKET",
-    SET_USER: "SET_USER",
-    ADD_USER: "ADD_USER",
-    SET_USER_LIST: "SET_USER_LIST"
-  };
 
   const initialState = {
     socket: null,
@@ -57,18 +59,14 @@ export default function useAppData(server) {
   // After everything renders, attempt to connect to socket.
   useEffect(() => {
     const socket = socketClient(server)
-    const userHandlers = makeUserHandlers(socket, dispatch, ACTIONS);
 
-    socket.on(EVENTS.SOCKET_CONNECT, () => dispatch({ type: ACTIONS.SET_SOCKET, socket}))
-
-    socket.on(EVENTS.USER_CONNECT, userHandlers.handleUserConnect)
-
-    socket.on(EVENTS.SOCKET_DISCONNECT, (reason) => dispatch({ type: ACTIONS.SET_SOCKET, socket: null}))
+    // Set up event handler functions
+    makeSocketEventHandlers({socket, dispatch, ACTIONS});
 
     return function cleanup() {
       socket.disconnect();
     }
-  }, [server, ACTIONS.SET_SOCKET]);
+  }, [server]);
 
   return { state, dispatch, ACTIONS };
 }
